@@ -13,7 +13,7 @@ def post_process_log():
                 solutionFile.write("\n")
             else:
                 if len(strippedLine) == 81:
-                    solutionFile.write(strippedLine)
+                    solutionFile.write(strippedLine + "\n")
                 else:
                     statisticsFile.write(strippedLine)
     f.close()
@@ -92,6 +92,7 @@ def process_statistics():
 def normalize_statistics():
     consolidatedStatisticsFile = open("consolidated_statistics.log", "r")
     consolidatedStatisticsNormalizedFile = open("consolidated_statistics_normalized.log", "w")
+    consolidatedStatisticsNormalizedFile.write("\n")
     medianStats = [0 for x in range(36)]
     minimumStats = [float("inf") for y in range(36)]
     maximumStats = [float("-inf") for z in range(36)]
@@ -116,11 +117,36 @@ def normalize_statistics():
                     consolidatedStatisticsNormalizedFile.write("%0.2f" % ((float(stat) - medianStats[statIndex])/(maximumStats[statIndex] - minimumStats[statIndex])))
                 else:
                     consolidatedStatisticsNormalizedFile.write("0")
-                consolidatedStatisticsNormalizedFile.write(",")
+                if statIndex < len(stats) - 1:
+                    consolidatedStatisticsNormalizedFile.write(",")
             consolidatedStatisticsNormalizedFile.write("\n")
-    consolidatedStatisticsNormalizedFile.write("\n")
     consolidatedStatisticsNormalizedFile.close()
     consolidatedStatisticsFile.close()
+    calculate_rank()
+
+def calculate_rank():
+    consolidatedStatisticsNormalizedFile = open("consolidated_statistics_normalized.log", "r")
+    weights = [1 for x in range(36)]
+    rankMeasures = []
+    for (lineIndex, line) in enumerate(consolidatedStatisticsNormalizedFile):
+        strippedLine = line.rstrip("\n")
+        if len(strippedLine) > 0:
+            stats = strippedLine.split(",")
+            rankMeasure = 0
+            for (statIndex, stat) in enumerate(stats):
+                rankMeasure += (float(stat) * weights[statIndex])
+            rankMeasures.append(rankMeasure)
+    ranks = [rank[0] for rank in sorted(enumerate(rankMeasures),key=lambda i:i[1])]
+    print(ranks)
+    rankFile = open("rank.log", "r+")
+    rankString = ""
+    for (lineNumber, line) in enumerate(rankFile):
+        strippedLine = line.rstrip("\n")
+        rankString += strippedLine + "," + str(ranks[lineNumber]) + "\n"
+    rankFile.seek(0)
+    rankFile.write(rankString)
+    rankFile.close()
+    consolidatedStatisticsNormalizedFile.close()
 
 if __name__ == "__main__":
    post_process_log()

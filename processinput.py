@@ -1,4 +1,6 @@
 intermediateInputFile = open("intermediate_input.log", "w")
+rankFile = open("rank.log", "w")
+rankFile.write("Clue,Rank\n")
 
 def pre_process_input():
     f = open("input.log", "r")
@@ -8,6 +10,7 @@ def pre_process_input():
             intermediateInputFile.write("\n".join(derive_sudoku(sudoku)) + "\n")
         else:
             print("ERROR: Invalid Sudoku - Ignoring Entry")
+    intermediateInputFile.close()
     f.close()
 
 def derive_sudoku(original):
@@ -21,6 +24,8 @@ def singleAbsentVariation(original):
     for (charIndex, char) in enumerate(original):
         if int(char) > 0:
             sudokuList.append(replacer(original, "0", charIndex))
+            rankFile.write(char + "\n")
+    rankFile.close()
     return sudokuList
 
 def replacer(s, newstring, index, nofail=False):
