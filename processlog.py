@@ -1,3 +1,5 @@
+import numpy
+
 solutionFile = open("solutions.log", "w")
 statisticsFile = open("statistics.log", "w")
 statisticsFile.write("\n")
@@ -136,8 +138,7 @@ def calculate_rank():
             for (statIndex, stat) in enumerate(stats):
                 rankMeasure += (float(stat) * weights[statIndex])
             rankMeasures.append(rankMeasure)
-    ranks = [rank[0] for rank in sorted(enumerate(rankMeasures),key=lambda i:i[1])]
-    print(ranks)
+    ranks = get_rank(rankMeasures)
     rankFile = open("rank.log", "r+")
     rankString = ""
     for (lineNumber, line) in enumerate(rankFile):
@@ -147,6 +148,13 @@ def calculate_rank():
     rankFile.write(rankString)
     rankFile.close()
     consolidatedStatisticsNormalizedFile.close()
+
+def get_rank(rankMeasures):
+    rankMeasures = numpy.array(rankMeasures)
+    temp = rankMeasures.argsort()
+    ranks = numpy.empty(len(rankMeasures), int)
+    ranks[temp] = numpy.arange(len(rankMeasures))
+    return ranks
 
 if __name__ == "__main__":
    post_process_log()
