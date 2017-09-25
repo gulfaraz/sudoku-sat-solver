@@ -17,6 +17,8 @@ def derive_sudoku(original):
     derived_sudoku = [original]
     #numberOfClues = sum((c.isdigit() and int(c) > 0) for c in original)
     derived_sudoku += singleAbsentVariation(original)
+    derived_sudoku += rollVariation(original)
+    rankFile.close()
     return derived_sudoku
 
 def singleAbsentVariation(original):
@@ -25,7 +27,13 @@ def singleAbsentVariation(original):
         if int(char) > 0:
             sudokuList.append(replacer(original, "0", charIndex))
             rankFile.write(char + "\n")
-    rankFile.close()
+    return sudokuList
+
+def rollVariation(original):
+    sudokuList = []
+    for index in range(len(original)):
+        sudokuList.append(original[-index:]+original[:-index])
+        rankFile.write("s" + str(index+1) + "\n")
     return sudokuList
 
 def replacer(s, newstring, index, nofail=False):
