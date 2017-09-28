@@ -2,9 +2,13 @@
 # Original Author: Nicholas Pilkington, 2015
 # License: MIT
 
+import os
 import pycosat
+import processlog
+import sys
 
-inputFileName = "intermediate_input.log"
+currentDirectory = os.path.dirname(__file__)
+
 N = 9
 M = 3
 
@@ -96,7 +100,7 @@ def solve_sudoku(constraints):
     cnf = cnf + [[transform(z[0], z[1], z[2])-1] for z in constraints]
 
     textSuDoKu = ""
-    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n")
     for solution in pycosat.itersolve(cnf, verbose=1):
         #print(len(solution))
         X = [ inverse_transform(v) for v in solution if v > 0]
@@ -111,11 +115,17 @@ def solve_sudoku(constraints):
             #if (i+1) % N == 0: print ""
     print(textSuDoKu)
 
-if __name__ == "__main__":
+def magic(index, dataPath):
+    intermediateInputFilePath = os.path.relpath(dataPath + "intermediate_input_" + str(int(index)) + ".log", currentDirectory)
+    intermediateInputFile = open(intermediateInputFilePath, "r")
     try:
-        f = open(inputFileName, "r")
+        f = intermediateInputFile
     except FileNotFoundError:
-        print("ERROR: Setup " + inputFileName + " with the sudokus and try again. A sudoku is a line with a string 000900000000000004400100000000000002020005340831000050900060000040380007057010200. You can have multiple sudokus in a file separated by a newline.")
+        print("ERROR: Try again. A sudoku is a line with a string 000900000000000004400100000000000002020005340831000050900060000040380007057010200. You can have multiple sudokus in a file separated by a newline.")
     else:
         #print("LOG: Reading from " + inputFileName)
         solve_input_file(f)
+        processlog.post_process_log(index, dataPath)
+
+if __name__ == "__main__":
+    magic(str(sys.argv[1]), str(sys.argv[2]))
