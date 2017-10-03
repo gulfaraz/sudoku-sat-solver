@@ -1,7 +1,7 @@
 import os
 import sat_solver
 
-dataPath = "/tmp/sudoku/"
+dataPath = "./data/"
 
 currentDirectory = os.path.dirname(__file__)
 
